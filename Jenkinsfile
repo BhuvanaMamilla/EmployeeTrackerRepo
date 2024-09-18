@@ -1,45 +1,35 @@
 pipeline {
     agent any
-    tools {
-        maven 'Maven 3.8.6' // Make sure this matches the Maven installation name in Jenkins configuration
-    }
+
     stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/BhuvanaMamilla/EmployeeTrackerRepo.git'
-            }
-        }
         stage('Build') {
             steps {
-                script {
-                    // Use Maven wrapper if available
-                    if (fileExists('mvnw')) {
-                        sh './mvnw clean install'
-                    } else {
-                        sh 'mvn clean install'
-                    }
-                }
+                // Build the project
+                sh 'mvn clean install'
             }
         }
+
         stage('Test') {
             steps {
-                script {
-                    // Use Maven wrapper if available
-                    if (fileExists('mvnw')) {
-                        sh './mvnw test'
-                    } else {
-                        sh 'mvn test'
-                    }
-                }
+                // Run tests
+                sh 'mvn test'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                // Deploy to environment (example step)
+                echo 'Deploying application...'
             }
         }
     }
+
     post {
         success {
-            echo 'Build and test succeeded!'
+            echo 'Pipeline succeeded!'
         }
         failure {
-            echo 'Build or test failed.'
+            echo 'Pipeline failed!'
         }
     }
 }
