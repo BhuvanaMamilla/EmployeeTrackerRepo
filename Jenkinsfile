@@ -1,31 +1,39 @@
 pipeline {
     agent any
-    
+    tools {
+        maven 'Maven 3.8.6' // Make sure this matches the Maven installation name in Jenkins configuration
+    }
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the specific branch, e.g., 'master'
-                git branch: 'main', url: 'https://github.com/BhuvanaMamilla/EmployeeTrackerRepo.git'
+                git 'https://github.com/BhuvanaMamilla/EmployeeTrackerRepo.git'
             }
         }
         stage('Build') {
             steps {
-                cleanWs()
-                sh './mvnw clean install || mvn clean install'
+                script {
+                    // Use Maven wrapper if available
+                    if (fileExists('mvnw')) {
+                        sh './mvnw clean install'
+                    } else {
+                        sh 'mvn clean install'
+                    }
+                }
             }
         }
         stage('Test') {
             steps {
-                sh './mvnw test || mvn test'
-            }
-        }
-        stage('Publish Test Results') {
-            steps {
-                junit '**/target/surefire-reports/*.xml'
+                script {
+                    // Use Maven wrapper if available
+                    if (fileExists('mvnw')) {
+                        sh './mvnw test'
+                    } else {
+                        sh 'mvn test'
+                    }
+                }
             }
         }
     }
-    
     post {
         success {
             echo 'Build and test succeeded!'
